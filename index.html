@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>Lease Red Flag Scanner — Free Rental Contract Analyzer</title>
+  <meta name="description" content="Free lease red flag scanner. Paste your rental agreement and instantly get a plain-English report of risky clauses, a Lease Health Score, and PDF export. 100% private — runs in your browser." />
+  <link rel="canonical" href="https://lease-scanner.vercel.app/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Lease Red Flag Scanner — Know What You're Signing" />
+  <meta property="og:description" content="Paste your lease and get a plain-English report of every risky clause. 40+ checks, Lease Health Score, PDF export. Free, instant, 100% private." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lease-scanner.vercel.app/" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lease Red Flag Scanner — Free Rental Contract Analyzer" />
+  <meta name="twitter:description" content="Paste your rental lease. Get a Lease Health Score, plain-English red flag report, and PDF export. Free, instant, 100% private — nothing sent to a server." />
+
+  <!-- WebApplication JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Lease Red Flag Scanner",
+    "url": "https://lease-scanner.vercel.app/",
+    "description": "Free lease red flag scanner. Paste any rental agreement and get an instant plain-English analysis of risky clauses across 40+ checks including entry-without-notice, auto rent increases, deposit waivers, and illegal terms. 100% browser-side — your text is never uploaded.",
+    "applicationCategory": "LegalApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": [
+      "40+ red flag pattern checks",
+      "Lease Health Score (0–100)",
+      "High / Medium / Low severity classification",
+      "Plain-English clause explanations",
+      "Original text snippet for each flag",
+      "PDF report export",
+      "100% private — runs entirely in browser",
+      "Dark / light mode"
+    ]
+  }
+  </script>
+
+  <!-- FAQPage JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is my lease text uploaded to a server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. All analysis runs entirely in your browser using JavaScript. Your lease text never leaves your device and is never sent to any server. You can even disconnect from the internet after loading the page and it will still work."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What lease clauses does this tool check for?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The scanner checks for 40+ patterns including: landlord entry without notice, automatic rent increases, non-refundable deposits, waived right to sue, jury trial waivers, rent acceleration clauses, early termination fees, auto-renewal clauses, subletting restrictions, excessive late fees, joint and several liability, mandatory arbitration, landlord liability waivers, lien on personal property, and more — each with a plain-English explanation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this legal advice?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. This tool is for informational purposes only and does not constitute legal advice. Results are based on pattern matching and may miss context-specific nuances. Always consult a qualified attorney before signing a lease, especially if the tool flags multiple high-severity issues."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the Lease Health Score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Lease Health Score is a number from 0 to 100 indicating overall lease fairness. It starts at 100 and is reduced by 15 points per High severity flag, 7 points per Medium flag, and 3 points per Low flag. Scores of 80–100 are good; 60–79 have some concerns; 40–59 are significant concerns; below 40 suggests you should consult a lawyer before signing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Which countries does this work for?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The scanner works best for leases written in English from the US, UK, Canada, and Australia. The pattern library is based on common Anglo-American lease language. Legal standards vary by jurisdiction — a clause flagged as potentially illegal in one state may be legal in another. Always verify with local tenant rights resources."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface2: #f1f5f9;
+      --border: #e2e8f0;
+      --accent: #1d4ed8;
+      --accent2: #1e40af;
+      --accent-light: #dbeafe;
+      --text: #0f172a;
+      --text2: #475569;
+      --muted: #94a3b8;
+      --high: #dc2626;
+      --high-bg: #fef2f2;
+      --high-border: #fecaca;
+      --medium: #d97706;
+      --medium-bg: #fffbeb;
+      --medium-border: #fde68a;
+      --low: #2563eb;
+      --low-bg: #eff6ff;
+      --low-border: #bfdbfe;
+      --good: #16a34a;
+      --good-bg: #f0fdf4;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(15,23,42,0.08);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #273347;
+      --border: #334155;
+      --accent: #60a5fa;
+      --accent2: #93c5fd;
+      --accent-light: #1e3a5f;
+      --text: #f1f5f9;
+      --text2: #94a3b8;
+      --muted: #64748b;
+      --high: #f87171;
+      --high-bg: #1f0707;
+      --high-border: #7f1d1d;
+      --medium: #fbbf24;
+      --medium-bg: #1c1208;
+      --medium-border: #78350f;
+      --low: #60a5fa;
+      --low-bg: #0b1628;
+      --low-border: #1e3a5f;
+      --good: #4ade80;
+      --good-bg: #052e16;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo { font-weight: 800; font-size: 1.1rem; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; }
+    nav { display: flex; gap: 1rem; align-items: center; }
+    nav a { color: var(--text2); text-decoration: none; font-size: 0.85rem; }
+    nav a:hover { color: var(--accent); }
+    .theme-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.35rem 0.65rem;
+      cursor: pointer; color: var(--text2); font-size: 1rem; transition: all 0.2s;
+    }
+    .theme-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .breadcrumb { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb span { margin: 0 0.4rem; }
+
+    .hero { text-align: center; margin-bottom: 2.5rem; }
+    .hero h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { color: var(--text2); font-size: 1.05rem; max-width: 600px; margin: 0 auto 1rem; }
+    .badges { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 0.5rem; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 0.3rem 0.9rem;
+      font-size: 0.8rem; color: var(--text2);
+    }
+    .badge-green { background: var(--good-bg); border-color: #86efac; color: var(--good); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+
+    /* Input area */
+    .input-wrap { position: relative; }
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      padding: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface2);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    textarea:focus { border-color: var(--accent); }
+    textarea::placeholder { color: var(--muted); }
+    .char-count { font-size: 0.78rem; color: var(--muted); text-align: right; margin-top: 0.4rem; }
+
+    .btn-row { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; align-items: center; }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 10px;
+      padding: 0.8rem 2rem; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: var(--surface2); color: var(--text2);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.8rem 1.25rem; font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-pdf {
+      background: #7c3aed; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 0.65rem 1.25rem; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .btn-pdf:hover { background: #6d28d9; }
+
+    /* Results */
+    #results { display: none; }
+    #results.visible { display: block; }
+
+    /* Score card */
+    .score-row { display: flex; gap: 1.5rem; align-items: stretch; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .score-card {
+      flex: 0 0 180px;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .score-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); margin-bottom: 0.5rem; }
+    .score-num { font-size: 3.5rem; font-weight: 900; line-height: 1; }
+    .score-sub { font-size: 0.82rem; color: var(--text2); margin-top: 0.4rem; }
+    .score-good { color: var(--good); border-color: #86efac; background: var(--good-bg); }
+    .score-warn { color: var(--medium); border-color: var(--medium-border); background: var(--medium-bg); }
+    .score-bad  { color: var(--high); border-color: var(--high-border); background: var(--high-bg); }
+
+    .flag-counts { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 480px) { .flag-counts { grid-template-columns: 1fr; } .score-card { flex: 1 1 100%; } }
+    .count-card {
+      border-radius: 12px; padding: 1rem; text-align: center;
+      border: 1px solid; display: flex; flex-direction: column; gap: 0.3rem;
+    }
+    .count-card .c-num { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .count-card .c-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .count-high   { background: var(--high-bg);   border-color: var(--high-border);   color: var(--high); }
+    .count-medium { background: var(--medium-bg); border-color: var(--medium-border); color: var(--medium); }
+    .count-low    { background: var(--low-bg);    border-color: var(--low-border);    color: var(--low); }
+
+    .results-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .results-header h2 { margin: 0; }
+
+    /* Flag items */
+    .flag-list { display: flex; flex-direction: column; gap: 0.85rem; }
+    .flag-item {
+      border: 1px solid; border-radius: 12px; padding: 1.1rem 1.25rem;
+      position: relative; overflow: hidden;
+    }
+    .flag-item::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+    .flag-high   { background: var(--high-bg);   border-color: var(--high-border); }
+    .flag-high::before { background: var(--high); }
+    .flag-medium { background: var(--medium-bg); border-color: var(--medium-border); }
+    .flag-medium::before { background: var(--medium); }
+    .flag-low    { background: var(--low-bg);    border-color: var(--low-border); }
+    .flag-low::before { background: var(--low); }
+
+    .flag-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem; }
+    .flag-title { font-size: 0.95rem; font-weight: 700; }
+    .flag-high .flag-title   { color: var(--high); }
+    .flag-medium .flag-title { color: var(--medium); }
+    .flag-low .flag-title    { color: var(--low); }
+
+    .sev-badge {
+      flex-shrink: 0; border-radius: 99px;
+      padding: 0.15rem 0.65rem; font-size: 0.72rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .sev-high   { background: var(--high);   color: #fff; }
+    .sev-medium { background: var(--medium); color: #fff; }
+    .sev-low    { background: var(--low);    color: #fff; }
+
+    .flag-message { font-size: 0.875rem; color: var(--text); line-height: 1.6; margin-bottom: 0.7rem; }
+    .flag-snippet {
+      background: rgba(0,0,0,0.04); border-radius: 7px;
+      padding: 0.65rem 0.85rem; font-size: 0.78rem;
+      font-family: 'Courier New', Courier, monospace;
+      color: var(--text2); line-height: 1.55;
+      border: 1px solid rgba(0,0,0,0.07);
+      word-break: break-word;
+    }
+    [data-theme="dark"] .flag-snippet { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.07); }
+    .flag-snippet mark { background: #fef08a; color: #1a1a1a; border-radius: 2px; padding: 0 2px; }
+    [data-theme="dark"] .flag-snippet mark { background: #854d0e; color: #fef9c3; }
+    .snippet-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.35rem; }
+
+    /* No flags banner */
+    .all-clear {
+      background: var(--good-bg); border: 1px solid #86efac;
+      border-radius: 12px; padding: 1.5rem; text-align: center;
+      color: var(--good);
+    }
+    .all-clear .ac-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .all-clear h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .all-clear p { font-size: 0.88rem; opacity: 0.85; }
+
+    .disclaimer {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.85rem 1rem; font-size: 0.82rem;
+      color: var(--text2); margin-top: 1rem; line-height: 1.6;
+    }
+
+    /* Steps */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 1rem; margin-top: 0.5rem; }
+    .step { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+    .step h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .step p { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
+
+    /* FAQ */
+    .faq-item { border-top: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:first-child { border-top: none; }
+    .faq-q { font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+    .faq-q .chevron { font-size: 0.75rem; transition: transform 0.2s; color: var(--muted); }
+    .faq-item.open .chevron { transform: rotate(180deg); }
+    .faq-a { font-size: 0.875rem; color: var(--text2); line-height: 1.65; margin-top: 0.75rem; display: none; }
+    .faq-item.open .faq-a { display: block; }
+
+    footer {
+      text-align: center; padding: 2.5rem 1.5rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem; color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; margin: 0 0.5rem; }
+    footer a:hover { color: var(--accent); }
+
+    /* Loading state */
+    .scanning-msg { text-align: center; padding: 1.5rem; color: var(--text2); font-size: 0.95rem; }
+
+    @media (max-width: 640px) { main { padding: 1.5rem 1rem; } .card { padding: 1.25rem; } }
+
+    /* ── Print styles ── */
+    @media print {
+      header, .hero, #inputCard, #howItWorks, #faqSection, footer, .btn-pdf, .btn-row, .theme-btn, nav { display: none !important; }
+      body { background: #fff !important; color: #000 !important; }
+      .card { box-shadow: none !important; border: 1px solid #ddd !important; break-inside: avoid; }
+      #results { display: block !important; }
+      .flag-item { break-inside: avoid; }
+      .flag-snippet { border: 1px solid #ccc !important; background: #f5f5f5 !important; }
+      .score-card, .count-card { border: 1px solid #999 !important; background: #f9f9f9 !important; }
+      .score-num, .flag-title, .c-num { color: #000 !important; }
+      .flag-message { color: #333 !important; }
+      .flag-snippet { color: #555 !important; }
+      .sev-high   { background: #dc2626 !important; }
+      .sev-medium { background: #d97706 !important; }
+      .sev-low    { background: #2563eb !important; }
+      .print-header { display: block !important; }
+    }
+    .print-header { display: none; margin-bottom: 1rem; }
+    .print-header h1 { font-size: 1.4rem; font-weight: 800; }
+    .print-header p { font-size: 0.82rem; color: #666; margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">🔍 Lease Scanner</a>
+  <nav>
+    <a href="#how-it-works">How it works</a>
+    <a href="#faq">FAQ</a>
+    <button class="theme-btn" id="themeBtn" title="Toggle dark mode">🌙</button>
+  </nav>
+</header>
+
+<main>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    <span>›</span>
+    <span>Lease Red Flag Scanner</span>
+  </nav>
+
+  <div class="hero">
+    <h1>Lease Red Flag Scanner —<br><span>Know What You're Signing</span></h1>
+    <p>Paste your rental agreement and instantly get a plain-English report of every risky clause, a Lease Health Score, and a printable PDF.</p>
+    <div class="badges">
+      <span class="badge badge-green">🔒 100% Private — Runs in Your Browser</span>
+      <span class="badge">⚡ Instant — No Upload, No Server</span>
+      <span class="badge">✅ 40+ Checks</span>
+    </div>
+  </div>
+
+  <!-- Input Card -->
+  <div class="card" id="inputCard">
+    <h2>📄 Paste Your Lease Text</h2>
+    <div class="input-wrap">
+      <textarea id="leaseText"
+        placeholder="Paste your full lease or rental agreement here...
+
+Tip: Copy from your PDF viewer (Ctrl+A, Ctrl+C) or from the email your landlord sent you. You can paste sections too — the scanner will check whatever you provide."
+        spellcheck="false"
+      ></textarea>
+      <div class="char-count"><span id="charCount">0</span> characters</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" id="analyzeBtn" onclick="analyze()">
+        🔍 Scan My Lease
+      </button>
+      <button class="btn-secondary" onclick="clearAll()">✕ Clear</button>
+      <span style="font-size:0.8rem;color:var(--muted);margin-left:auto">Your text never leaves this page.</span>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+
+    <div class="card">
+      <div class="print-header">
+        <h1>Lease Red Flag Report</h1>
+        <p>Generated by Lease Scanner (lease-scanner.vercel.app) · <span id="printDate"></span></p>
+      </div>
+
+      <!-- Score + counts -->
+      <div class="score-row">
+        <div class="score-card" id="scoreCard">
+          <div class="score-label">Lease Health Score</div>
+          <div class="score-num" id="scoreNum">—</div>
+          <div class="score-sub" id="scoreSub">—</div>
+        </div>
+        <div class="flag-counts">
+          <div class="count-card count-high">
+            <div class="c-num" id="highCount">0</div>
+            <div class="c-label">🔴 High</div>
+          </div>
+          <div class="count-card count-medium">
+            <div class="c-num" id="mediumCount">0</div>
+            <div class="c-label">🟡 Medium</div>
+          </div>
+          <div class="count-card count-low">
+            <div class="c-num" id="lowCount">0</div>
+            <div class="c-label">🔵 Low</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flag list header -->
+      <div class="results-header">
+        <h2 id="flagsHeading">🚩 Flagged Clauses</h2>
+        <button class="btn-pdf" onclick="printReport()">🖨️ Print / Save PDF</button>
+      </div>
+
+      <div class="flag-list" id="flagList"></div>
+
+      <div class="disclaimer">
+        ⚖️ <strong>Not legal advice.</strong> This tool uses pattern matching to highlight common lease risks. It may miss some issues and may flag clauses that are legal in your jurisdiction. Always consult a qualified attorney before signing, especially if multiple High severity flags are found.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- How It Works -->
+  <div class="card" id="how-it-works">
+    <h2>⚙️ How the Lease Scanner Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Paste Your Lease</h3>
+        <p>Copy the full text of your rental agreement from a PDF, email, or document and paste it into the box above.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Instant Analysis</h3>
+        <p>40+ pattern checks run instantly in your browser. Nothing is uploaded — your private documents stay private.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Review Red Flags</h3>
+        <p>Each flagged clause is shown with the original text snippet, a plain-English explanation, and a High / Medium / Low severity rating.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Export &amp; Act</h3>
+        <p>Print or save the report as a PDF. Take the High severity items to a tenant rights lawyer for a quick review before signing.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="card" id="faqSection">
+    <h2 id="faq">❓ Frequently Asked Questions</h2>
+    <div id="faqList"></div>
+  </div>
+
+</main>
+
+<footer>
+  <p>Lease Red Flag Scanner — Free Rental Contract Analyzer. Runs entirely in your browser. No data collected.</p>
+  <p style="margin-top:0.5rem">
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Use</a>
+  </p>
+  <p style="margin-top:0.5rem">Not legal advice. Consult a qualified attorney for guidance specific to your situation.</p>
+</footer>
+
+<script>
+/* ── Theme ── */
+const themeBtn = document.getElementById('themeBtn');
+const saved = localStorage.getItem('lease-theme');
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function updateThemeIcon() {
+  themeBtn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+}
+updateThemeIcon();
+themeBtn.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('lease-theme', next);
+  updateThemeIcon();
+});
+
+/* ── Char counter ── */
+const leaseText = document.getElementById('leaseText');
+leaseText.addEventListener('input', () => {
+  document.getElementById('charCount').textContent = leaseText.value.length.toLocaleString();
+});
+
+/* ── Red Flag Library (40+ patterns) ── */
+const RED_FLAGS = [
+  // ─── HIGH ──────────────────────────────────────────────────────────────────
+  {
+    id: 'entry-no-notice',
+    pattern: /(?:landlord|owner|lessor|management)(?:[^.!?]{0,80})(?:enter|access|inspect|enter the (?:unit|premises|property))(?:[^.!?]{0,80})without(?:[^.!?]{0,60})(?:notice|consent|permission|approval)/i,
+    severity: 'high',
+    title: 'Landlord Entry Without Notice',
+    message: 'The landlord appears able to enter your home without advance notice. Most US states, Canadian provinces, and UK law require 24–48 hours notice except in genuine emergencies. This clause may be illegal where you live.'
+  },
+  {
+    id: 'enter-any-time',
+    pattern: /right\s+to\s+enter\s+(?:the\s+)?(?:premises|unit|property|apartment|home)\s+at\s+any\s+time/i,
+    severity: 'high',
+    title: 'Landlord May Enter at Any Time',
+    message: 'This grants unrestricted access to your home without any notice requirement. This likely violates tenant privacy rights in most jurisdictions.'
+  },
+  {
+    id: 'auto-rent-increase',
+    pattern: /(?:rent|monthly (?:payment|amount))(?:[^.!?]{0,100})(?:automatically|auto|annually|each year|every year)(?:[^.!?]{0,80})(?:increase|raise|escalate|adjust)/i,
+    severity: 'high',
+    title: 'Automatic Rent Increase',
+    message: 'Rent can be raised automatically — possibly without a cap. Check what the maximum increase is and whether it requires written notice. If uncapped, this could dramatically raise your costs.'
+  },
+  {
+    id: 'non-refundable-deposit',
+    pattern: /(?:security deposit|deposit|fee)(?:[^.!?]{0,60})(?:non[-\s]?refundable|not\s+refundable|will\s+not\s+be\s+returned|forfeited)/i,
+    severity: 'high',
+    title: 'Non-Refundable Security Deposit',
+    message: 'A "non-refundable deposit" is a contradiction — security deposits are legally refundable in most US states and many countries after normal wear and tear deductions. This clause may be unenforceable.'
+  },
+  {
+    id: 'waive-deposit-rights',
+    pattern: /waive(?:[^.!?]{0,60})(?:right|claim|entitlement)(?:[^.!?]{0,60})(?:security deposit|deposit return|refund)/i,
+    severity: 'high',
+    title: 'Security Deposit Rights Waived',
+    message: 'You may be waiving your statutory right to recover your security deposit. Courts often void such waivers, but it creates risk and could lead to a costly dispute.'
+  },
+  {
+    id: 'landlord-not-liable',
+    pattern: /(?:landlord|lessor|owner|management)(?:[^.!?]{0,80})(?:not\s+(?:be\s+)?(?:liable|responsible|held responsible)|no\s+liability)(?:[^.!?]{0,60})(?:injury|damage|loss|harm|death|accident)/i,
+    severity: 'high',
+    title: 'Landlord Not Liable for Injuries',
+    message: 'The landlord is attempting to waive liability for injuries that occur on the property. Courts frequently refuse to enforce such clauses when the injury results from landlord negligence.'
+  },
+  {
+    id: 'waive-right-sue',
+    pattern: /waive(?:[^.!?]{0,60})(?:right\s+to\s+(?:sue|file suit|legal action|bring action|litigate)|any\s+claim\s+against)/i,
+    severity: 'high',
+    title: 'Waiver of Right to Sue',
+    message: 'You may be giving up your right to take the landlord to court. This is a serious red flag — consult a tenant rights attorney before signing.'
+  },
+  {
+    id: 'waive-jury-trial',
+    pattern: /waive(?:[^.!?]{0,40})(?:right\s+to\s+a?\s*jury|jury\s+trial)/i,
+    severity: 'high',
+    title: 'Jury Trial Waiver',
+    message: 'You are waiving your right to a jury trial in any dispute with the landlord. This significantly limits your legal recourse and may favor the landlord who has more experience with the arbitration process.'
+  },
+  {
+    id: 'rent-acceleration',
+    pattern: /(?:accelerat(?:e|ion)|all\s+(?:remaining|unpaid|future)\s+rent|balance\s+of\s+(?:the\s+)?(?:lease|rent|term))(?:[^.!?]{0,80})(?:immediately\s+due|become\s+due\s+and\s+payable|due\s+and\s+payable\s+immediately)/i,
+    severity: 'high',
+    title: 'Rent Acceleration Clause',
+    message: 'If you miss a payment or violate any lease term, the entire remaining rent for the lease term could become immediately due — potentially thousands of dollars at once.'
+  },
+  {
+    id: 'lien-personal-property',
+    pattern: /(?:lien|security interest|landlord(?:[^.!?]{0,30})right)(?:[^.!?]{0,60})(?:personal property|belongings|furniture|possessions|tenant(?:[^.!?]{0,20})property)/i,
+    severity: 'high',
+    title: 'Lien on Personal Property',
+    message: 'The landlord may claim the right to hold or sell your personal belongings if you owe rent or damages. This is illegal in many jurisdictions — check your local laws.'
+  },
+  {
+    id: 'landlord-modify-terms',
+    pattern: /(?:landlord|lessor|owner|management)(?:[^.!?]{0,80})(?:modify|change|amend|alter|update)(?:[^.!?]{0,80})(?:terms|agreement|lease|rules)(?:[^.!?]{0,60})without(?:[^.!?]{0,40})(?:consent|approval|agreement|permission)/i,
+    severity: 'high',
+    title: 'Landlord Can Change Lease Terms Unilaterally',
+    message: 'The landlord may be able to change lease terms without your agreement. A valid contract requires mutual consent for modifications — one-sided changes are generally unenforceable.'
+  },
+  {
+    id: 'evict-any-violation',
+    pattern: /(?:evict|terminate\s+(?:the\s+)?(?:tenancy|lease|rental))(?:[^.!?]{0,60})(?:any\s+violation|violation\s+of\s+any|breach\s+of\s+any)(?:[^.!?]{0,40})(?:provision|term|rule|condition)/i,
+    severity: 'high',
+    title: 'Eviction for Any Violation',
+    message: 'The landlord may claim the right to evict you for any breach, no matter how minor. Courts generally require material breach to justify eviction, but this language invites frivolous eviction threats.'
+  },
+  {
+    id: 'confess-judgment',
+    pattern: /confess(?:ion\s+of)?\s+judgment|cognovit\s+note|warrant\s+(?:of\s+)?attorney/i,
+    severity: 'high',
+    title: 'Confession of Judgment / Cognovit Clause',
+    message: 'This clause allows the landlord to obtain a court judgment against you without first giving you notice or an opportunity to defend yourself. This is illegal in many states.'
+  },
+
+  // ─── MEDIUM ─────────────────────────────────────────────────────────────────
+  {
+    id: 'mandatory-arbitration',
+    pattern: /(?:mandatory|binding|compulsory|required)\s+arbitration/i,
+    severity: 'medium',
+    title: 'Mandatory Arbitration Clause',
+    message: 'Disputes must go to arbitration rather than a court. You may lose the right to a public hearing, class-action participation, and a jury. Arbitrators are often perceived as more favorable to repeat-use parties (landlords).'
+  },
+  {
+    id: 'early-termination-fee',
+    pattern: /early\s+termination(?:[^.!?]{0,60})(?:fee|penalty|charge|\$\s*\d|\d+\s*month)|(?:break|breaking)\s+(?:the\s+)?lease(?:[^.!?]{0,60})(?:fee|penalty|\$\s*\d|months?\s+rent)/i,
+    severity: 'medium',
+    title: 'Early Termination Fee',
+    message: 'There is a financial penalty for ending the lease early. Check the exact amount — fees of 1–2 months rent are common, but higher amounts may be negotiable or challengeable.'
+  },
+  {
+    id: 'auto-renew',
+    pattern: /(?:automatically|auto)\s+(?:renew|renews|renewal|extend|converts?)(?:[^.!?]{0,80})(?:unless|if you do not|without|absent)(?:[^.!?]{0,60})(?:notice|written notice)/i,
+    severity: 'medium',
+    title: 'Automatic Renewal Without Adequate Notice',
+    message: 'The lease automatically renews unless you give written notice — often 30–60 days before the end date. Missing this window locks you into another full term. Set a calendar reminder well in advance.'
+  },
+  {
+    id: 'subletting-restricted',
+    pattern: /(?:no|not\s+permitted|prohibited|without\s+(?:prior\s+)?written\s+consent)(?:[^.!?]{0,50})(?:sublet|subleasing?|subleas(?:e|ing)|assign(?:ment)?(?:\s+of\s+(?:the\s+)?(?:lease|tenancy))?)/i,
+    severity: 'medium',
+    title: 'Subletting Restricted or Prohibited',
+    message: 'You cannot sublet or assign the lease without the landlord\'s written approval. This limits your exit options if circumstances change (job relocation, etc.) before the lease ends.'
+  },
+  {
+    id: 'joint-several-liability',
+    pattern: /jointly\s+and\s+severally\s+(?:liable|responsible)/i,
+    severity: 'medium',
+    title: 'Joint and Several Liability (Roommates)',
+    message: 'Each tenant is individually liable for the full rent. If a roommate stops paying, the landlord can sue you for their share. Make sure you fully trust anyone you share a lease with.'
+  },
+  {
+    id: 'attorney-fees-tenant',
+    pattern: /(?:tenant|lessee|resident)(?:[^.!?]{0,60})(?:pay|responsible for|shall pay|liable for)(?:[^.!?]{0,40})attorney(?:[^.!?]{0,20})fees?/i,
+    severity: 'medium',
+    title: "Tenant Pays Landlord's Legal Fees",
+    message: "You may be required to pay the landlord's attorney fees if they win a dispute. Check whether this obligation is mutual — if it's one-sided, it's a red flag that discourages you from asserting your rights."
+  },
+  {
+    id: 'holdover-penalty',
+    pattern: /holdover(?:[^.!?]{0,80})(?:double|twice|two\s+times|2x|150%|200%|additional|extra)(?:[^.!?]{0,40})(?:rent|amount)/i,
+    severity: 'medium',
+    title: 'Holdover Penalty (Double Rent)',
+    message: 'If you stay even one day past the lease end date, you may owe double rent or more. Plan your move-out and lease transition carefully to avoid an expensive mistake.'
+  },
+  {
+    id: 'no-alterations',
+    pattern: /(?:no|not|shall not|may not|must not)(?:[^.!?]{0,60})(?:alter(?:ation)?s?|modif(?:y|ication)|paint|drill|nail|install|affix|attach|change\s+the)(?:[^.!?]{0,60})(?:wall|floor|ceiling|fixture|unit|premises)/i,
+    severity: 'medium',
+    title: 'No Alterations or Modifications',
+    message: 'You may not be permitted to make any changes — including painting walls, hanging pictures, or installing shelves — without written consent. Violations can result in charges on your deposit.'
+  },
+  {
+    id: 'renters-insurance-required',
+    pattern: /renter(?:s)?(?:[^.!?]{0,30})insurance(?:[^.!?]{0,60})(?:required|must\s+(?:obtain|carry|maintain|purchase)|shall\s+(?:obtain|carry|maintain))/i,
+    severity: 'medium',
+    title: "Renter's Insurance Required",
+    message: "You must maintain renter's insurance as a condition of the lease. This adds an ongoing cost (typically $10–$30/month). Verify the required coverage limits and whether you must name the landlord as additional insured."
+  },
+  {
+    id: 'guest-restrictions',
+    pattern: /guest(?:s)?(?:[^.!?]{0,80})(?:not\s+(?:stay|remain|occupy)\s+(?:more\s+than|longer\s+than|exceeding?\s+)|\bexceed(?:ing)?\s+\d+\s+(?:days?|nights?|consecutive)|\bmaximum\s+(?:of\s+)?\d+\s+(?:days?|nights?))/i,
+    severity: 'medium',
+    title: 'Strict Guest Restrictions',
+    message: 'There are limits on how long guests may stay. Violating this — even unintentionally — can be grounds for eviction. Check the exact limit and whether temporary guests are affected.'
+  },
+  {
+    id: 'landlord-no-repairs',
+    pattern: /(?:landlord|lessor|owner)(?:[^.!?]{0,80})(?:not\s+(?:be\s+)?(?:responsible|obligated|required|liable)|assumes?\s+no\s+responsibility)(?:[^.!?]{0,60})(?:repair|maintenance|fix|upkeep)/i,
+    severity: 'medium',
+    title: 'Landlord Not Responsible for Repairs',
+    message: 'The landlord may be disclaiming all maintenance responsibility. In most jurisdictions landlords have a non-waivable duty to maintain habitable conditions (working heat, plumbing, no pests). This clause may be illegal.'
+  },
+  {
+    id: 'no-lock-changes',
+    pattern: /(?:tenant|lessee|resident)(?:[^.!?]{0,60})(?:shall not|may not|not permitted to|prohibited from)(?:[^.!?]{0,50})(?:change|replace|add|install|rekey)(?:[^.!?]{0,30})lock/i,
+    severity: 'medium',
+    title: 'Cannot Change or Add Locks',
+    message: 'You may not be able to rekey or add a deadbolt for your own security. Some jurisdictions give tenants an unconditional right to change locks. Check local tenant rights law.'
+  },
+  {
+    id: 'excessive-late-fee',
+    pattern: /late\s+(?:payment\s+)?fee(?:[^.!?]{0,60})(?:\$\s*(?:1[5-9]\d|[2-9]\d{2,}|\d{4,})|(?:1[5-9]|[2-9]\d)\s*%)/i,
+    severity: 'medium',
+    title: 'Potentially Excessive Late Fee',
+    message: 'The late fee amount may exceed the legal cap in your area. Many US states limit late fees to 5–10% of monthly rent or a flat dollar amount. Verify the cap in your jurisdiction.'
+  },
+  {
+    id: 'liquidated-damages',
+    pattern: /liquidated\s+damages(?:[^.!?]{0,100})(?:agree|shall\s+pay|owed|equal to)/i,
+    severity: 'medium',
+    title: 'Liquidated Damages Clause',
+    message: 'A pre-set damages amount is written in for certain lease violations. Ensure the amount is reasonable — courts void liquidated damages clauses that function as punitive penalties.'
+  },
+
+  // ─── LOW ────────────────────────────────────────────────────────────────────
+  {
+    id: 'auto-renew-simple',
+    pattern: /(?:automatically\s+renew|auto-renew|converts?\s+to\s+(?:a\s+)?month.to.month)(?![^.!?]{0,80}(?:unless|without))/i,
+    severity: 'low',
+    title: 'Auto-Renewal Mention',
+    message: 'The lease mentions automatic renewal. Review the exact notice period required to prevent it — typically 30–60 days before the lease end date.'
+  },
+  {
+    id: 'no-smoking',
+    pattern: /no\s+smoking|smoking\s+(?:is\s+)?(?:prohibited|not\s+(?:allowed|permitted))|smoke.?free\s+(?:building|property|premises)/i,
+    severity: 'low',
+    title: 'No Smoking Policy',
+    message: 'Smoking is prohibited. Confirm whether this applies to balconies, common areas, cannabis, and e-cigarettes. Violations can result in deposit deductions or eviction.'
+  },
+  {
+    id: 'no-pets',
+    pattern: /no\s+pets(?:\s+(?:of\s+any\s+kind|allowed|permitted))?|pets?\s+(?:are\s+)?(?:not\s+(?:allowed|permitted)|prohibited|strictly\s+forbidden)/i,
+    severity: 'low',
+    title: 'No Pets Allowed',
+    message: 'Pets are prohibited. Note: rules around ADA service animals and emotional support animals are governed by federal and state law and may override this clause regardless of what the lease says.'
+  },
+  {
+    id: 'cleaning-fee-moveout',
+    pattern: /cleaning\s+(?:fee|charge|cost|deposit)(?:[^.!?]{0,60})(?:vacate|move.?out|end\s+of\s+(?:the\s+)?(?:tenancy|lease)|upon\s+(?:termination|departure))/i,
+    severity: 'low',
+    title: 'Move-Out Cleaning Fee',
+    message: 'A cleaning fee will be charged when you leave. Document the property\'s condition at move-in with dated photos. Normal wear and tear cannot legally be charged to you in most jurisdictions.'
+  },
+  {
+    id: 'rules-may-change',
+    pattern: /rules?(?:[^.!?]{0,80})(?:may|can|are\s+subject\s+to)(?:[^.!?]{0,50})(?:change|amend(?:ed)?|modif(?:y|ied)|update)/i,
+    severity: 'low',
+    title: 'Rules May Be Changed by Landlord',
+    message: 'Building or community rules can be changed by the landlord. Check whether adequate written notice is required before changes take effect — ideally 30 days minimum.'
+  },
+  {
+    id: 'parking-additional-fee',
+    pattern: /parking(?:[^.!?]{0,80})(?:additional\s+(?:fee|charge|cost)|extra\s+(?:fee|charge)|not\s+included|separate\s+(?:fee|charge)|\$\s*\d+\s*per\s+month)/i,
+    severity: 'low',
+    title: 'Parking Charged Separately',
+    message: 'Parking has additional fees or is not included. Confirm the monthly amount, whether your spot is guaranteed, and what happens if the spot is unavailable.'
+  },
+  {
+    id: 'tenant-landscaping',
+    pattern: /tenant(?:[^.!?]{0,80})(?:responsible|shall\s+maintain|must\s+maintain)(?:[^.!?]{0,60})(?:lawn|landscaping|yard|garden|grass|mow)/i,
+    severity: 'low',
+    title: 'Tenant Responsible for Landscaping',
+    message: 'You are responsible for maintaining the lawn or garden. Clarify what equipment is provided, what standards are expected, and whether there are penalties for violations.'
+  },
+  {
+    id: 'hoa-rules-apply',
+    pattern: /(?:hoa|homeowner(?:s)?(?:[^.!?]{0,20})association)(?:[^.!?]{0,60})(?:rules|regulations|bylaws)(?:[^.!?]{0,60})(?:apply|govern|bind|subject to)/i,
+    severity: 'low',
+    title: 'HOA Rules Apply to Tenant',
+    message: 'You may be bound by homeowners association rules even as a renter. Request a current copy of the HOA rules — fines for violations may be passed to you as additional charges.'
+  },
+  {
+    id: 'utilities-all-tenant',
+    pattern: /tenant(?:[^.!?]{0,60})(?:responsible\s+for|shall\s+pay\s+for|pay\s+all)(?:[^.!?]{0,60})(?:all\s+utilities|electric(?:ity)?|gas\s+and\s+electric|water,?\s+(?:sewer,?\s+)?(?:and\s+)?gas)/i,
+    severity: 'low',
+    title: 'Tenant Responsible for All Utilities',
+    message: 'You pay all utility costs. Estimate monthly averages for electricity, gas, water, and internet before signing — especially in climates with extreme heat or cold.'
+  },
+  {
+    id: 'no-home-office',
+    pattern: /(?:no|not\s+permitted|prohibited)(?:[^.!?]{0,60})(?:business|commercial\s+activity|home\s+office|conduct\s+(?:any\s+)?business)/i,
+    severity: 'low',
+    title: 'Home Office / Business Prohibited',
+    message: 'Running any business from the unit may be prohibited. If you work from home, confirm whether this applies to remote employees or only client-facing businesses.'
+  },
+  {
+    id: 'short-notice-vacate',
+    pattern: /(?:notice\s+to\s+vacate|vacate\s+notice|notice\s+of\s+(?:intent\s+to\s+)?vacate|tenant\s+shall\s+provide\s+notice)(?:[^.!?]{0,60})(?:7|ten|10|fourteen|14|fifteen|15)\s*(?:-|\s+)?day/i,
+    severity: 'low',
+    title: 'Short Move-Out Notice Period',
+    message: 'The required notice-to-vacate period appears to be less than 30 days. Standard practice is 30–60 days. Check whether this period is reasonable for your planning needs.'
+  },
+];
+
+/* ── Snippet extraction ── */
+function extractSnippet(text, match, context = 160) {
+  const start  = Math.max(0, match.index - context);
+  const end    = Math.min(text.length, match.index + match[0].length + context);
+  let snippet  = text.slice(start, end).replace(/\s+/g, ' ').trim();
+  if (start > 0) snippet = '…' + snippet;
+  if (end < text.length) snippet += '…';
+  return snippet;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function highlightMatch(snippet, matchedText) {
+  const escaped = escapeHtml(snippet);
+  const target  = escapeHtml(matchedText.replace(/\s+/g, ' ').trim());
+  return escaped.replace(target, `<mark>${target}</mark>`);
+}
+
+/* ── Score logic ── */
+function computeScore(flags) {
+  let score = 100;
+  flags.forEach(f => {
+    if (f.severity === 'high')   score -= 15;
+    if (f.severity === 'medium') score -= 7;
+    if (f.severity === 'low')    score -= 3;
+  });
+  return Math.max(0, Math.min(100, score));
+}
+
+/* ── Main analysis ── */
+function analyze() {
+  const text = leaseText.value.trim();
+  if (text.length < 100) {
+    alert('Please paste at least some lease text (100+ characters) for the scanner to work.');
+    return;
+  }
+
+  const found = [];
+  const seenIds = new Set();
+
+  RED_FLAGS.forEach(flag => {
+    if (seenIds.has(flag.id)) return;
+    const match = flag.pattern.exec(text);
+    if (match) {
+      seenIds.add(flag.id);
+      found.push({ ...flag, match, snippet: extractSnippet(text, match) });
+    }
+  });
+
+  // Sort: high first, then medium, then low
+  const order = { high: 0, medium: 1, low: 2 };
+  found.sort((a, b) => order[a.severity] - order[b.severity]);
+
+  const score  = computeScore(found);
+  const high   = found.filter(f => f.severity === 'high').length;
+  const medium = found.filter(f => f.severity === 'medium').length;
+  const low    = found.filter(f => f.severity === 'low').length;
+
+  // Score card
+  const scoreCard = document.getElementById('scoreCard');
+  const scoreNum  = document.getElementById('scoreNum');
+  const scoreSub  = document.getElementById('scoreSub');
+  scoreCard.className = 'score-card';
+  scoreNum.textContent = score;
+  if (score >= 80) {
+    scoreCard.classList.add('score-good');
+    scoreSub.textContent = 'Looks Reasonable';
+  } else if (score >= 55) {
+    scoreCard.classList.add('score-warn');
+    scoreSub.textContent = 'Some Concerns';
+  } else {
+    scoreCard.classList.add('score-bad');
+    scoreSub.textContent = 'Significant Concerns';
+  }
+
+  document.getElementById('highCount').textContent   = high;
+  document.getElementById('mediumCount').textContent = medium;
+  document.getElementById('lowCount').textContent    = low;
+
+  // Flags heading
+  const heading = document.getElementById('flagsHeading');
+  heading.textContent = found.length > 0
+    ? `🚩 ${found.length} Issue${found.length !== 1 ? 's' : ''} Found`
+    : '✅ No Issues Detected';
+
+  // Flag list
+  const flagList = document.getElementById('flagList');
+  flagList.innerHTML = '';
+
+  if (found.length === 0) {
+    flagList.innerHTML = `
+      <div class="all-clear">
+        <div class="ac-icon">✅</div>
+        <h3>No Red Flags Detected</h3>
+        <p>The scanner found no matching patterns in this text. That's a good sign — but remember this tool uses pattern matching and may miss context-specific risks. If you have any doubts, consult a local tenant rights clinic.</p>
+      </div>`;
+  } else {
+    found.forEach(f => {
+      const matchedText = f.match[0].replace(/\s+/g, ' ').trim();
+      const snippetHtml = highlightMatch(f.snippet, matchedText);
+      const div = document.createElement('div');
+      div.className = `flag-item flag-${f.severity}`;
+      div.innerHTML = `
+        <div class="flag-top">
+          <div class="flag-title">${escapeHtml(f.title)}</div>
+          <span class="sev-badge sev-${f.severity}">${f.severity}</span>
+        </div>
+        <div class="flag-message">${escapeHtml(f.message)}</div>
+        <div class="snippet-label">Found in your lease</div>
+        <div class="flag-snippet">${snippetHtml}</div>
+      `;
+      flagList.appendChild(div);
+    });
+  }
+
+  // Print date
+  document.getElementById('printDate').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Show results, scroll to them
+  const resultsEl = document.getElementById('results');
+  resultsEl.classList.add('visible');
+  setTimeout(() => resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+function clearAll() {
+  leaseText.value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('results').classList.remove('visible');
+  leaseText.focus();
+}
+
+function printReport() {
+  window.print();
+}
+
+/* ── FAQ ── */
+const faqs = [
+  { q: 'Is my lease text uploaded to a server?', a: 'No. All analysis runs entirely in your browser using JavaScript. Your lease text never leaves your device. You can disconnect from the internet after loading the page and the scanner still works.' },
+  { q: 'What clauses does this tool check for?', a: 'The scanner checks 40+ patterns including: landlord entry without notice, automatic rent increases, non-refundable deposits, waived right to sue, jury trial waivers, rent acceleration, early termination fees, auto-renewal, subletting restrictions, joint and several liability, mandatory arbitration, landlord liability waivers, lien on personal property, no-alterations clauses, renter\'s insurance requirements, excessive late fees, and more.' },
+  { q: 'Is this legal advice?', a: 'No. This tool is for informational purposes only and does not constitute legal advice. Results are based on pattern matching and may miss context-specific nuances or flag clauses that are legal in your jurisdiction. Always consult a qualified attorney before signing, especially if multiple High severity issues are found.' },
+  { q: 'What is the Lease Health Score?', a: 'The score starts at 100 and is reduced by 15 points per High flag, 7 per Medium, and 3 per Low. Scores of 80–100 suggest a reasonable lease; 55–79 indicate some concerns worth reviewing; below 55 suggests you should consult a tenant rights attorney before signing.' },
+  { q: 'Which countries does this work for?', a: 'Best for leases written in English from the US, UK, Canada, and Australia. The pattern library is based on common Anglo-American lease language. Legal standards vary by jurisdiction — a clause flagged here may be legal in your state or country. Always cross-reference with local tenant rights resources.' },
+];
+
+const faqList = document.getElementById('faqList');
+faqs.forEach(f => {
+  const div = document.createElement('div');
+  div.className = 'faq-item';
+  div.innerHTML = `<div class="faq-q"><span>${f.q}</span><span class="chevron">▼</span></div><div class="faq-a">${f.a}</div>`;
+  div.querySelector('.faq-q').addEventListener('click', () => div.classList.toggle('open'));
+  faqList.appendChild(div);
+});
+</script>
+</body>
+</html>
