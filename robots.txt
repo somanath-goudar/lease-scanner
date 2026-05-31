@@ -3,4 +3,4 @@ Allow: /
 Disallow: /privacy.html
 Disallow: /terms.html
 
-Sitemap: https://lease-scanner-three.vercel.app/sitemap.xml
+Sitemap: https://leasescan.app/sitemap.xml
